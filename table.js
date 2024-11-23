@@ -18,7 +18,8 @@ function printAsciiTable() {
         table += '\n';
     }
 
-    return table;
+    console.log('Printing ASCII table');
+    console.log(table);
 }
 
 console.log(printAsciiTable());

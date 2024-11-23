@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Text to Hex Converter</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">
+            Ceaser Cipher
+        </h1>
+    </div>
+
+    <div class="container">
+        <input type="text" id="textInput" placeholder="Enter Regular text here" class = "input">
+    </div>
+    
+    <div class="container">
+        <input type="text" id="ASCIIInput" placeholder="Enter ASCI text here" class = "input">
+    </div>
+
+    
+
+    <div class="container">
+        <button onclick="convertTextToHex()" class="button-30">Convert to Hex</button>
+        <button onclick="printAsciiTable()" class="button-30">Convert to Text</button>
+    </div>
+
+    <div class="container">
+        <table class="table">
+            <tbody>
+                <tr><td>&nbsp; (20)</td><td>8 (38)</td><td>P (50)</td><td>h (68)</td></tr>
+                <tr><td>! (21)</td><td>9 (39)</td><td>Q (51)</td><td>i (69)</td></tr>
+                <tr><td>" (22)</td><td>: (3A)</td><td>R (52)</td><td>j (6A)</td></tr>
+                <tr><td># (23)</td><td>; (3B)</td><td>S (53)</td><td>k (6B)</td></tr>
+                <tr><td>$ (24)</td><td>&lt; (3C)</td><td>T (54)</td><td>l (6C)</td></tr>
+                <tr><td>% (25)</td><td>= (3D)</td><td>U (55)</td><td>m (6D)</td></tr>
+                <tr><td>&amp; (26)</td><td>&gt; (3E)</td><td>V (56)</td><td>n (6E)</td></tr>
+                <tr><td>' (27)</td><td>? (3F)</td><td>W (57)</td><td>o (6F)</td></tr>
+                <tr><td>( (28)</td><td>@ (40)</td><td>X (58)</td><td>p (70)</td></tr>
+                <tr><td>) (29)</td><td>A (41)</td><td>Y (59)</td><td>q (71)</td></tr>
+                <tr><td>* (2A)</td><td>B (42)</td><td>Z (5A)</td><td>r (72)</td></tr>
+                <tr><td>+ (2B)</td><td>C (43)</td><td>[ (5B)</td><td>s (73)</td></tr>
+                <tr><td>, (2C)</td><td>D (44)</td><td>\ (5C)</td><td>t (74)</td></tr>
+                <tr><td>- (2D)</td><td>E (45)</td><td>] (5D)</td><td>u (75)</td></tr>
+                <tr><td>. (2E)</td><td>F (46)</td><td>^ (5E)</td><td>v (76)</td></tr>
+                <tr><td>/ (2F)</td><td>G (47)</td><td>_ (5F)</td><td>w (77)</td></tr>
+                <tr><td>0 (30)</td><td>H (48)</td><td>` (60)</td><td>x (78)</td></tr>
+                <tr><td>1 (31)</td><td>I (49)</td><td>a (61)</td><td>y (79)</td></tr>
+                <tr><td>2 (32)</td><td>J (4A)</td><td>b (62)</td><td>z (7A)</td></tr>
+                <tr><td>3 (33)</td><td>K (4B)</td><td>c (63)</td><td>{ (7B)</td></tr>
+                <tr><td>4 (34)</td><td>L (4C)</td><td>d (64)</td><td>| (7C)</td></tr>
+                <tr><td>5 (35)</td><td>M (4D)</td><td>e (65)</td><td>} (7D)</td></tr>
+                <tr><td>6 (36)</td><td>N (4E)</td><td>f (66)</td><td>~ (7E)</td></tr>
+                <tr><td>7 (37)</td><td>O (4F)</td><td>g (67)</td><td></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="simple.js"></script>
+    
+</body>
+</html>
+
