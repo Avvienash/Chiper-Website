@@ -68,3 +68,4 @@ function printAsciiTable() {
     console.log('Printing ASCII table');
     console.log(table);
 }
+

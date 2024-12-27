@@ -1,260 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASCII Code Encoder/Decoder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 1000vh; 
-        }
-        .container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-        }
-        h1 {kz
-            text-align: center;
-            color: #333;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 5px;
-            margin-bottom: 20px;
-        }
-        .box {
-            width: 50px; /* Width adjusted for 3 digits */
-            height: 40px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            border: 1px solid black;
-            border-radius: 4px;
-            background-color: white;
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: border 0.3s;
-            padding: 0 5px;
-            box-sizing: border-box;
-            max-width: 100%;
-        }
-        .box.filled {
-            border: 1px solid black; /* Retain black border when filled */
-        }
-        .box.active {
-            border: 2px solid blue; /* Blue border for active box */
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .label {
-            margin: 0 0 5px;
-            font-weight: bold;
-        }
-        input[type="text"] {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Ceaser Chiper</title>
 </head>
 <body>
-    <!--HELLO CAN YOU SEE ME-->
     <div class="container">
-        <h1>ASCII Conversion</h1>
-
-        <p class="label">Regular Text (Max 10 characters):</p>
-        <div id="textGrid" class="grid"></div>
-
-        <p class="label">ASCII Code (Max 10 values, 3 digits per box):</p>
-        <div id="asciiGrid" class="grid"></div>
-
-        <button onclick="encodeToASCII()">Regular Characters to ASCII Decimal</button>
-        <button onclick="decodeFromASCII()">ASCII Decimal to Regular Characters</button>
-
-        <!-- Hidden input fields -->
-        <input id="normalTextInput" type="text" maxlength="10" autofocus>
-        <input id="asciiInput" type="text" maxlength="30">
+        <h1 class="title">
+            Ceaser Cipher
+        </h1>
     </div>
 
+    <div class="container">
+        <label class="text" for="shift">Shift Amount: </label>
+        <input class= "input" type="number" id="shift" min="0" max="25" value="0">
+        <button class="button" id="rotate-btn">Rotate</button>
+    </div>
+
+
+    <div class="container">
+        
+        <div class="box">
+        </div>
+
+        <div class="box">
+            <div class="wheel-container">
+                <div class="wheel outer-wheel">
+                    <div class="letters" id="outer-letters"></div>
+                </div>
+                <div class="wheel inner-wheel">
+                    <div class="letters" id="inner-letters"></div>
+                </div>
+                <div class="wheel inner-inner-wheel"></div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="script.js"></script>
     <script>
-        const maxCharacters = 10;
-        const maxDigitsPerBox = 3; // 3 digits per ASCII box
+        // Create A-Z letters for the wheels
+        const createLetters = (id, inner) => {
+            const lettersContainer = document.getElementById(id);
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            
+            // Get the radius dynamically from the container size
+            const containerSize = lettersContainer.offsetWidth; // Assuming the container is a square
+            const radius = containerSize / 2 - 5;
 
-        // Create the grids for both normal text and ASCII codes
-        function createGrid(containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Clear existing grid
-            for (let i = 0; i < maxCharacters; i++) {
-                const box = document.createElement('div');
-                box.className = 'box';
-                box.setAttribute('contenteditable', 'true');
-                container.appendChild(box);
+            
+
+            // Calculate font size based on the container size
+            const fontSize = Math.floor(containerSize / 20); // Font size is 1/20th of container size, adjust as needed
+
+
+            for (let i = 0; i < 26; i++) {
+                const letterSpan = document.createElement("span");
+                letterSpan.textContent = letters[i];
+
+                // Calculate the angle to rotate each letter around the circle
+                const angle = (i * 360) / 26;
+
+                // Apply transform to rotate each letter and position it along the circumference
+                letterSpan.style.position = "absolute";
+                letterSpan.style.transform = `rotate(${angle}deg) translateY(-${radius - fontSize}px) rotate(${-angle}deg)`;
+
+                // Set the font size based on the container size
+                letterSpan.style.fontSize = `${fontSize}px`;
+
+                // Append the letter to the container
+                lettersContainer.appendChild(letterSpan);
             }
-        }
+        };
+        createLetters("outer-letters",false);
+        createLetters("inner-letters",true);
 
-        function updateGrid(containerId, values) {
-            const container = document.getElementById(containerId);
-            const boxes = container.querySelectorAll('.box');
-            boxes.forEach((box, index) => {
-                box.innerText = values[index] || '';
-                // Add the filled class if the box is not empty
-                if (values[index]) {
-                    box.classList.add('filled');
-                } else {
-                    box.classList.remove('filled');
-                }
-            });
-        }
+        const outerWheel = document.querySelector(".outer-wheel");
+        const innerWheel = document.querySelector(".inner-wheel");
+        const rotateBtn = document.getElementById("rotate-btn");
+        const shiftInput = document.getElementById("shift");
 
-        function getGridValues(containerId) {
-            const container = document.getElementById(containerId);
-            return Array.from(container.querySelectorAll('.box'))
-                .map(box => box.innerText.trim())
-                .filter(value => value !== '');
-        }
+        // Rotate the wheel
+        rotateBtn.addEventListener("click", () => {
+            const shiftAmount = parseInt(shiftInput.value, 10) || 0;
 
-        function encodeToASCII() {
-            const textValues = getGridValues('textGrid');
-            if (textValues.length === 0) {
-                alert('Please enter text to encode.');
-                return;
-            }
-            const asciiValues = textValues.map(char => char.charCodeAt(0).toString());
-            updateGrid('asciiGrid', asciiValues);
-        }
+            // Rotate each letter by the specified angle with 5 sec animation
 
-        function decodeFromASCII() {
-            const asciiValues = getGridValues('asciiGrid');
-            if (asciiValues.length === 0) {
-                alert('Please enter ASCII codes to decode.');
-                return;
-            }
-            try {
-                const textValues = asciiValues.map(code => String.fromCharCode(parseInt(code, 10)));
-                updateGrid('textGrid', textValues);
-            } catch (error) {
-                alert('Invalid ASCII input. Ensure all entries are valid numbers.');
-            }
-        }
+            const outerWheelLetters = outerWheel.querySelectorAll("span");
+            const containerSize = outerWheel.offsetWidth;
+            const radius = containerSize / 2;
+            const fontSize = Math.floor(containerSize / 20); 
 
-        // Handle input for normal text grid
-        function handleTextGridInput(event) {
-            const grid = document.getElementById('textGrid');
-            const boxes = grid.querySelectorAll('.box');
-            let nextBox = null;
 
-            boxes.forEach((box, index) => {
-                if (box === event.target) {
-                    box.classList.add('filled');
-                    nextBox = boxes[index + 1] || null;
-                } else {
-                    box.classList.remove('active');
-                }
+            outerWheelLetters.forEach((letter, i) => {
+                
+                angle = (i * 360) / 26 + shiftAmount * 360 / 26;
+
+
+                letter.style.transition = "transform 5s";
+                letter.style.transform = `rotate(${angle}deg) translateY(-${radius - fontSize}px) rotate(${-angle}deg)`;
             });
 
-            // Move the active blue border to the next box
-            if (nextBox) {
-                nextBox.classList.add('active');
-                nextBox.focus();
-            }
-        }
 
-        // Handle input for ASCII code grid
-        function handleAsciiGridInput(event) {
-            const grid = document.getElementById('asciiGrid');
-            const boxes = grid.querySelectorAll('.box');
-            let nextBox = null;
-
-            // Track the input length for the box
-            const currentValue = event.target.innerText.trim();
-
-            // If the box is filled with 3 characters, move to the next one
-            if (currentValue.length >= maxDigitsPerBox) {
-                nextBox = boxes[Array.from(boxes).indexOf(event.target) + 1] || null;
-                if (nextBox) {
-                    nextBox.focus();
-                }
-            }
-        }
-
-        // Set the active box (move the blue border)
-        function setActiveBox(containerId) {
-            const boxes = document.getElementById(containerId).querySelectorAll('.box');
-            boxes.forEach(box => box.classList.remove('active'));
-            const activeBox = Array.from(boxes).find(box => box.innerText === '' || box.innerText === null);
-            if (activeBox) {
-                activeBox.classList.add('active');
-                activeBox.focus();
-            }
-        }
-
-        // Initialize grids and hidden input
-        createGrid('textGrid');
-        createGrid('asciiGrid');
-
-        // Add event listeners for grid inputs
-        document.getElementById('textGrid').addEventListener('click', () => {
-            setActiveBox('textGrid');
-        });
-        document.getElementById('asciiGrid').addEventListener('click', () => {
-            setActiveBox('asciiGrid');
         });
 
-        // Handle typing events for both normal text and ASCII inputs
-        document.querySelectorAll('.box').forEach(box => {
-            box.addEventListener('input', handleTextGridInput);
-        });
 
-        document.querySelectorAll('.box').forEach(box => {
-            box.addEventListener('input', handleAsciiGridInput);
-        });
 
-        // Deactivate active box if clicking outside the grid
-        document.body.addEventListener('click', (event) => {
-            if (!document.getElementById('textGrid').contains(event.target) && 
-                !document.getElementById('asciiGrid').contains(event.target)) {
-                document.querySelectorAll('.box').forEach(box => box.classList.remove('active'));
-            }
-        });
 
-        // Handle Backspace to move to the previous box and place cursor at the end
-        document.querySelectorAll('.box').forEach(box => {
-            box.addEventListener('keydown', function(event) {
-                if (event.key === 'Backspace' && event.target.innerText === '') {
-                    const previousBox = event.target.previousElementSibling;
-                    if (previousBox) {
-                        previousBox.classList.add('active');
-                        previousBox.focus();
-                        previousBox.innerText = previousBox.innerText.trim();
-                    }
-                }
-            });
-        });
+        
+
     </script>
+    
 </body>
 </html>
+
