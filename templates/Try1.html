@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caesar Cipher Challenge</title>
+  <style>
+    /* General Body Styling */
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: "Roboto", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    /* Main Container */
+    .container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #1e1e1e;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+      width: 80%;
+      max-width: 600px;
+    }
+
+    /* Heading Styling */
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+
+    /* Text and Input Styling */
+    p {
+      font-size: 1.2em;
+      margin: 10px 0;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 1em;
+      margin: 10px;
+      border: 2px solid #4CAF50;
+      border-radius: 5px;
+      background-color: #000;
+      color: white;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+      border-color: #3e8e41;
+      outline: none;
+    }
+
+    /* Button Styling */
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+      transform: scale(1.05);
+    }
+
+    /* Guess Log Styling */
+    #guess-log {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center rows horizontally */
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    /* Guess Row Styling */
+    #guess-log div {
+      display: flex;
+      gap: 10px; /* Space between boxes */
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Individual Boxes Styling */
+    #guess-log div div {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #333;
+      color: white;
+      font-size: 16px;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Correct and Incorrect Styling */
+    .correct {
+      background-color: #4CAF50;
+    }
+
+    .incorrect {
+      background-color: #D32F2F;
+    }
+  </style>
+</head>
+<body>
+
+  
+
+  
+  <div class="container">
+    <h1>Caesar Cipher Challenge</h1>
+    <p>Encoded Text: <span id="encoded-text"></span></p>
+    <p>Guess the shift value:</p>
+    <input type="number" id="shift-value" placeholder="Shift Guess" />
+    <button id="submit-guess">Submit Guess</button>
+    <div id="guess-log"></div>
+  </div>
+
+  <script>
+    console.log("Script loaded");
+
+    const encodedTextDisplay = document.getElementById("encoded-text");
+    const shiftValueInput = document.getElementById("shift-value");
+    const submitGuessButton = document.getElementById("submit-guess");
+    const guessLog = document.getElementById("guess-log");
+
+    let randomShift = 0; // Random shift value
+    let encodedText = ""; // Encoded text
+    let attempts = 0; // Track user attempts
+    const maxAttempts = 5; // Maximum allowed attempts
+
+    // Dictionary of 5-letter words related to ciphers
+    const plaintextDictionary = [
+      "cipher",
+      "block",
+      "prime",
+      "token",
+      "shift",
+      "alpha",
+      "plain",
+      "curve",
+      "digit",
+      "keyed",
+    ];
+
+    // Caesar Cipher Encode Function
+    function caesarCipherEncode(plaintext, shift) {
+      let encodedText = "";
+      for (let char of plaintext) {
+        if (char.match(/[a-zA-Z]/)) {
+          const charCode = char.charCodeAt(0);
+          const isUpperCase = charCode >= 65 && charCode <= 90;
+
+          let newCharCode = charCode + shift;
+          if (isUpperCase) {
+            if (newCharCode > 90) newCharCode -= 26;
+            if (newCharCode < 65) newCharCode += 26;
+          } else {
+            if (newCharCode > 122) newCharCode -= 26;
+            if (newCharCode < 97) newCharCode += 26;
+          }
+
+          encodedText += String.fromCharCode(newCharCode);
+        } else {
+          encodedText += char; // Preserve spaces and special characters
+        }
+      }
+      return encodedText;
+    }
+
+    // Generate a random encoded text challenge
+    function generateChallenge() {
+      const selectedPlaintext =
+        plaintextDictionary[
+          Math.floor(Math.random() * plaintextDictionary.length)
+        ];
+
+      randomShift = Math.floor(Math.random() * 26) + 1; // Random shift between 1 and 26
+      encodedText = caesarCipherEncode(selectedPlaintext, randomShift);
+
+      encodedTextDisplay.textContent = encodedText;
+      console.log(
+        `Generated encoded text: "${encodedText}" with shift: ${randomShift}`
+      ); // Debugging
+    }
+
+    // Update Guess Log and Decoded Result
+    function updateGuessLog(shiftValue, decodedText, isCorrect) {
+      const decodedResultContainer = document.createElement("div");
+      decodedResultContainer.style.cssText = `
+        display: flex; 
+        gap: 10px; 
+        justify-content: center; 
+        flex-wrap: wrap; 
+        margin-top: 10px;
+      `;
+
+      // Add Key Box
+      const keyBox = document.createElement("div");
+      keyBox.textContent = `Key = ${shiftValue}`;
+      keyBox.style.cssText = `
+        width: 70px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: ${isCorrect ? "#4CAF50" : "#D32F2F"};
+        color: white;
+        font-size: 14px;
+      `;
+      decodedResultContainer.appendChild(keyBox);
+
+      // Add Character Boxes
+      for (let char of decodedText) {
+        const charBox = document.createElement("div");
+        charBox.textContent = char;
+        charBox.style.cssText = `
+          width: 40px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          background-color: ${isCorrect ? "#4CAF50" : "#D32F2F"};
+          color: white;
+          font-size: 16px;
+        `;
+        decodedResultContainer.appendChild(charBox);
+      }
+
+      guessLog.appendChild(decodedResultContainer);
+    }
+
+    // Event Listener for Submitting a Guess
+    submitGuessButton.addEventListener("click", () => {
+      const shiftValue = parseInt(shiftValueInput.value);
+
+      if (isNaN(shiftValue)) {
+        alert("Please enter a valid shift value.");
+        return;
+      }
+
+      const decodedText = caesarCipherEncode(encodedText, -shiftValue);
+      const isCorrect = shiftValue === randomShift;
+
+      updateGuessLog(shiftValue, decodedText, isCorrect);
+
+      if (isCorrect) {
+        alert(`Congratulations! You guessed the correct shift!`);
+        submitGuessButton.disabled = true;
+        shiftValueInput.disabled = true;
+      } else {
+        attempts++;
+        if (attempts >= maxAttempts) {
+          alert(`Game over! The correct shift was ${randomShift}.`);
+          submitGuessButton.disabled = true;
+          shiftValueInput.disabled = true;
+        } else {
+          alert(`Incorrect shift! Attempts remaining: ${maxAttempts - attempts}`);
+        }
+      }
+    });
+
+    generateChallenge();
+  </script>
+</body>
+</html>
+
