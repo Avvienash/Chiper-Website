@@ -7,22 +7,35 @@
     <title>Ceaser Chiper</title>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">
-            Ceaser Cipher
-        </h1>
-    </div>
-
-    <div class="container">
-        <label class="text" for="shift">Shift Amount: </label>
-        <input class= "input" type="number" id="shift" min="0" max="25" value="0">
-        <button class="button" id="rotate-btn">Rotate</button>
-    </div>
-
 
     <div class="container">
         
-        <div class="box">
+        <div class="left-side">
+            <div class="container">
+                <h1 class="title">
+                    Ceaser Cipher Challenge
+                </h1>
+            </div>
+        
+            <div class="container">
+                <h1 class="text">Encoded Text: <span id="encoded-text"></span></h1>
+            </div>
+        
+            <div class="container">
+                <label class="text" for="shift">Shift Amount: </label>
+                <input class= "input" type="number" id="shift-value"  min="0" max="25" value="0">
+                <button class="button" id="submit-guess">Submit Guess</button>
+            </div>
+        
+            <div id="guess-log"></div>
+
+            <div class="container">
+                <button class="button" id="play-again">Play Again</button>
+            </div>
+
+            <div id="game-message" class="text" style="margin-top: 20px; font-weight: bold;"></div>
+            
+
         </div>
 
         <div class="box">
@@ -39,9 +52,6 @@
 
     </div>
 
-
-
-    <script src="script.js"></script>
     <script>
         // Create A-Z letters for the wheels
         const createLetters = (id, inner) => {
@@ -81,8 +91,8 @@
 
         const outerWheel = document.querySelector(".outer-wheel");
         const innerWheel = document.querySelector(".inner-wheel");
-        const rotateBtn = document.getElementById("rotate-btn");
-        const shiftInput = document.getElementById("shift");
+        const rotateBtn = document.getElementById("submit-guess");
+        const shiftInput = document.getElementById("shift-value");
 
         // Rotate the wheel
         rotateBtn.addEventListener("click", () => {
@@ -108,8 +118,161 @@
 
         });
 
+        // DOM Elements
+        const encodedTextDisplay = document.getElementById("encoded-text");
+        const gameMessage = document.getElementById("game-message");
+        const shiftValueInput = document.getElementById("shift-value");
+        const submitGuessButton = document.getElementById("submit-guess");
+        const guessLog = document.getElementById("guess-log");
+        const playAgainButton = document.getElementById("play-again");
 
+        // Game Setup Function
+        function setupGame() {
+            // Reset Variables
+            let randomShift = 0;
+            let encodedText = "";
+            let attempts = 0;
+            const maxAttempts = 5;
 
+            // Dictionary of plaintext words
+            const plaintextDictionary = [
+                "cipher", "block", "prime", "token", "shift",
+                "alpha", "plain", "curve", "digit", "keyed"
+            ];
+
+            // Reset UI Elements
+            encodedTextDisplay.textContent = "";
+            shiftValueInput.value = "";
+            submitGuessButton.disabled = false;
+            shiftValueInput.disabled = false;
+            guessLog.innerHTML = "";
+            gameMessage.textContent = "";
+
+            // Caesar Cipher Encode Function
+            function caesarCipherEncode(plaintext, shift) {
+                return [...plaintext].map(char => {
+                    if (/[a-zA-Z]/.test(char)) {
+                        const charCode = char.charCodeAt(0);
+                        const isUpperCase = charCode >= 65 && charCode <= 90;
+
+                        let newCharCode = charCode + shift;
+                        if (isUpperCase) {
+                            if (newCharCode > 90) newCharCode -= 26;
+                            if (newCharCode < 65) newCharCode += 26;
+                        } else {
+                            if (newCharCode > 122) newCharCode -= 26;
+                            if (newCharCode < 97) newCharCode += 26;
+                        }
+                        return String.fromCharCode(newCharCode);
+                    }
+                    return char; // Preserve spaces and special characters
+                }).join('');
+            }
+
+            // Generate a new encoded text challenge
+            function generateChallenge() {
+                const selectedPlaintext = plaintextDictionary[
+                    Math.floor(Math.random() * plaintextDictionary.length)
+                ];
+
+                randomShift = Math.floor(Math.random() * 26) + 1; // Random shift between 1 and 26
+                encodedText = caesarCipherEncode(selectedPlaintext, randomShift);
+                encodedTextDisplay.textContent = encodedText;
+                console.log(`Generated encoded text: "${encodedText}" with shift: ${randomShift}`);
+            }
+
+            // Update Guess Log
+            function updateGuessLog(shiftValue, decodedText, isCorrect) {
+                const decodedResultContainer = document.createElement("div");
+                decodedResultContainer.style.cssText = `
+                    display: flex; 
+                    gap: 10px; 
+                    justify-content: center; 
+                    flex-wrap: wrap; 
+                    margin-top: 10px;
+                `;
+
+                // Add Key Box
+                const keyBox = document.createElement("div");
+                keyBox.textContent = `Key = ${shiftValue}`;
+                keyBox.style.cssText = `
+                    width: 70px;
+                    height: 40px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    background-color: ${isCorrect ? "#4CAF50" : "#D32F2F"};
+                    color: white;
+                    font-size: 14px;
+                `;
+                decodedResultContainer.appendChild(keyBox);
+
+                // Add Character Boxes
+                [...decodedText].forEach(char => {
+                    const charBox = document.createElement("div");
+                    charBox.textContent = char;
+                    charBox.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: ${isCorrect ? "#4CAF50" : "#D32F2F"};
+                        color: white;
+                        font-size: 16px;
+                    `;
+                    decodedResultContainer.appendChild(charBox);
+                });
+
+                guessLog.appendChild(decodedResultContainer);
+            }
+
+            // Handle Guess Submission
+            function handleGuessSubmission() {
+                const shiftValue = parseInt(shiftValueInput.value);
+
+                if (isNaN(shiftValue)) {
+                    shiftValueInput.placeholder = "Enter a valid number!";
+                    return;
+                }
+
+                const decodedText = caesarCipherEncode(encodedText, -shiftValue);
+                const isCorrect = shiftValue === randomShift;
+
+                updateGuessLog(shiftValue, decodedText, isCorrect);
+
+                if (isCorrect) {
+                    gameMessage.textContent = "Congratulations! You guessed the correct shift!";
+                    submitGuessButton.disabled = true;
+                    shiftValueInput.disabled = true;
+                } else {
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        gameMessage.textContent = `Game over! The correct shift was ${randomShift}.`;
+                        submitGuessButton.disabled = true;
+                        shiftValueInput.disabled = true;
+                    } else {
+                        gameMessage.textContent = `Incorrect! Attempts remaining: ${maxAttempts - attempts}`;
+                    }
+                }
+            }
+
+            // Initialize Game
+            generateChallenge();
+
+            // Attach Event Listener for Submit Button
+            submitGuessButton.onclick = handleGuessSubmission;
+        }
+
+        // Attach Event Listener to Play Again Button
+        playAgainButton.onclick = setupGame;
+
+        // Start Game Initially
+        setupGame();
 
         
 
